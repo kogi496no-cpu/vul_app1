@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./frontend_app.py:/app/frontend_app.py
+      - ./templates:/app/templates
+      - ./flag.txt:/app/flag.txt
+      - ./static:/app/static
+    networks:
+      - app-network
+
+  internal_api:
+    build:
+      context: .
+      dockerfile: Dockerfile.internal
+    # ポートは外部に公開しない！
+    volumes:
+      - ./internal_api.py:/app/internal_api.py
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
