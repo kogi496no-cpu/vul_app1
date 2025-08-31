@@ -19,18 +19,18 @@
     ```bash
     docker compose up --build -d
     ```
-    **注意:** ポート `5001` が既に他のプロセスで使用されている場合、起動に失敗することがあります。その場合は、`docker compose down` で既存のコンテナを停止するか、`docker-compose.yml` の `frontend` サービスの `ports` 設定を変更してください。
+    **注意:** ポート `5000` が既に他のプロセスで使用されている場合、起動に失敗することがあります。その場合は、`docker compose down` で既存のコンテナを停止するか、`docker-compose.yml` の `frontend` サービスの `ports` 設定を変更してください。
 
 ## 💡 使い方
 
-アプリケーションは `http://localhost:5001` で動作します。
+アプリケーションは `http://localhost:5000` で動作します。
 
 ### 🌐 OGPプレビュー機能 (SSRFのデモンストレーション)
 
-`http://localhost:5001/ssrf` にアクセスしてください。
+`http://localhost:5000/ssrf` にアクセスしてください。
 
 1.  **正しい使い方 (OGPプレビュー):**
-    *   `http://localhost:5001/sample` のURLをフォームに入力し、「プレビュー生成」ボタンをクリックしてください。
+    *   `http://localhost:5000/sample` のURLをフォームに入力し、「プレビュー生成」ボタンをクリックしてください。
     *   OGP情報（タイトル、説明、画像）がカード形式で表示されます。
 
 2.  **SSRF攻撃の実行:**
@@ -44,6 +44,6 @@
 
 ### 🔒 内部API (直接アクセス不可)
 
-`http://localhost:5001/internal` に直接アクセスしてみてください。
+`http://localhost:5000/internal` に直接アクセスしてみてください。
 このAPIは外部に公開されていないため、ブラウザからはアクセスできないことを確認できます。
 

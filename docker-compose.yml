@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile.frontend
     ports:
-      - "5001:5000"
+      - "5000:5000"
     volumes:
       - ./frontend_app.py:/app/frontend_app.py
       - ./templates:/app/templates
