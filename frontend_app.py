@@ -1,4 +1,4 @@
-from flask import Flask, request, Response, render_template, jsonify
+from flask import Flask, request, Response, render_template, jsonify, render_template_string
 import requests
 from lxml import etree
 from urllib.parse import urlparse
@@ -86,6 +86,77 @@ def upload_xml():
         return f"Root element is: {doc.tag}"
     except etree.XMLSyntaxError as e:
         return f"Invalid XML: {e}", 400
+
+# パーソナライズされたメッセージ表示機能 (SSTI脆弱性)
+@app.route('/personalize', methods=['GET', 'POST'])
+def personalize_page():
+    if request.method == 'POST':
+        name = request.form.get('name', '名無し')
+        department = request.form.get('department', '所属不明')
+        motto = request.form.get('motto', '')
+
+        # mottoをテンプレートとしてレンダリング（SSTI脆弱性）
+        rendered_motto = render_template_string(motto)
+
+        # 結果をプロフィールカード風のHTMLで返す
+        response_html = f"""
+        <!DOCTYPE html>
+        <html lang="ja">
+        <head>
+            <meta charset="UTF-8">
+            <title>生成された紹介カード</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+            <style>
+                body {{
+                    background-color: #f8f9fa;
+                }}
+                .profile-card {{
+                    max-width: 500px;
+                    margin: 50px auto;
+                    border: none;
+                    border-radius: 15px;
+                    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+                }}
+                .card-header {{
+                    background-color: #343a40;
+                    color: white;
+                    font-weight: bold;
+                    border-top-left-radius: 15px;
+                    border-top-right-radius: 15px;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="card profile-card text-center">
+                    <div class="card-header py-3">
+                        MEMBER PROFILE
+                    </div>
+                    <div class="card-body p-4">
+                        <img src="/static/images/office.png" class="rounded-circle mb-3" alt="profile image" width="100">
+                        <h3 class="card-title">{name}</h3>
+                        <h5 class="card-subtitle mb-2 text-muted">{department}</h5>
+                        <hr>
+                        <p class="card-text fst-italic">" {rendered_motto} "</p>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <a href="/personalize" class="btn btn-primary">もう一度作成</a>
+                    <a href="/" class="btn btn-secondary">トップに戻る</a>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        return response_html
+    return render_template('personalize.html')
+
+# SSTI脆弱性を持つエンドポイント
+@app.route('/ssti')
+def ssti_page():
+    template = request.args.get('template', 'Hello, {{ name }}!')
+    name = request.args.get('name', 'Guest')
+    return render_template_string(template, name=name)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
