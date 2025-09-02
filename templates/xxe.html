@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>SVGアップローダー</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>SVGプロフィール画像アップローダー</h1>
+        <p>お気に入りのSVG画像をアップロードして、プロフィール画像に設定しましょう！</p>
+        
+        <form action="/xxe" method="post" enctype="multipart/form-data" class="form-container">
+            <div class="form-group">
+                <label for="svg_file">SVGファイルを選択:</label>
+                <input type="file" name="svg_file" id="svg_file" accept="image/svg+xml">
+            </div>
+            <button type="submit">アップロード</button>
+        </form>
+
+        {% if uploaded_svg %}
+        <div class="result-container">
+            <h2>アップロードされた画像</h2>
+            <div class="svg-display">
+                {{ uploaded_svg | safe }}
+            </div>
+            <p class="info-text">画像が正しく表示されない場合は、SVGファイルの内容を確認してください。</p>
+        </div>
+        {% endif %}
+
+        {% if error %}
+        <div class="error-container">
+            <h2>エラー</h2>
+            <p>{{ error }}</p>
+        </div>
+        {% endif %}
+
+        <a href="/">トップに戻る</a>
+    </div>
+</body>
+</html>

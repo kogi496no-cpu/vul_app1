@@ -73,19 +73,39 @@ def fetch():
     except Exception as e:
         return Response(f"予期せぬエラーが発生しました: {e}", mimetype='text/plain', status=500)
 
-# XXE脆弱性を持つエンドポイント
-@app.route('/upload-xml', methods=['POST'])
-def upload_xml():
-    xml_data = request.data
-    if not xml_data:
-        return "Please post XML data.", 400
+# XXE脆弱性を持つエンドポイント (SVGアップローダー)
+@app.route('/xxe', methods=['GET', 'POST'])
+def xxe_page():
+    if request.method == 'POST':
+        if 'svg_file' not in request.files:
+            return render_template('xxe.html', error='ファイルが選択されていません。')
+        
+        file = request.files['svg_file']
+        if file.filename == '':
+            return render_template('xxe.html', error='ファイル名が空です。')
 
-    try:
-        parser = etree.XMLParser(resolve_entities=True)
-        doc = etree.fromstring(xml_data, parser)
-        return f"Root element is: {doc.tag}"
-    except etree.XMLSyntaxError as e:
-        return f"Invalid XML: {e}", 400
+        if file and file.mimetype == 'image/svg+xml':
+            try:
+                svg_content = file.read()
+                
+                # XXE脆弱性を作り込むためのパーサー
+                # resolve_entities=True がキモよ！
+                parser = etree.XMLParser(resolve_entities=True)
+                doc = etree.fromstring(svg_content, parser)
+                
+                # パースした内容を文字列として再度レンダリング
+                # これで外部エンティティが展開された結果が表示される
+                uploaded_svg = etree.tostring(doc, pretty_print=True).decode('utf-8')
+                
+                return render_template('xxe.html', uploaded_svg=uploaded_svg)
+            except etree.XMLSyntaxError as e:
+                return render_template('xxe.html', error=f'無効なSVGファイルです: {e}')
+            except Exception as e:
+                return render_template('xxe.html', error=f'予期せぬエラーが発生しました: {e}')
+        else:
+            return render_template('xxe.html', error='SVGファイルを選択してください。')
+
+    return render_template('xxe.html')
 
 # パーソナライズされたメッセージ表示機能 (SSTI脆弱性)
 @app.route('/personalize', methods=['GET', 'POST'])
