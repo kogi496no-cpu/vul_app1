@@ -21,6 +21,37 @@
     ```
     **注意:** ポート `5000` が既に他のプロセスで使用されている場合、起動に失敗することがあります。その場合は、`docker compose down` で既存のコンテナを停止するか、`docker-compose.yml` の `frontend` サービスの `ports` 設定を変更してください。
 
+## 構成図
+
+```mermaid
+graph TD
+    subgraph "Docker Network (app-network)"
+        A[frontend]
+        B[internal_api]
+    end
+
+    User -- "HTTP Request" --> A
+    A -- "SSRF Attack" --> B
+
+    style User fill:#f9f,stroke:#333,stroke-width:2px
+```
+
+## アプリケーション構成
+
+このアプリケーションは、意図的に脆弱性を持つように構築された2つのコンテナで構成されています。
+
+- **`frontend`**:
+  - ユーザーが直接ブラウザでアクセスするWebアプリケーションです (`http://localhost:5000`)。
+  - PythonのFlaskフレームワークで実装されています。
+  - SSRF、SSTI、XXE、安全でないデシリアライゼーションといった複数の脆弱性を持つエンドポイントが実装されています。
+
+- **`internal_api`**:
+  - 外部ネットワークには公開されていない、内部専用のAPIサービスです。
+  - `frontend`コンテナからは `http://internal_api:5000` という名前でアクセス可能です。
+  - SSRF脆弱性を利用した攻撃のターゲットとして機能し、本来アクセスできないはずの内部情報（例: DB接続情報）を返します。
+
+これら2つのコンテナは `docker-compose.yml` によって定義され、`app-network` という共通の仮想ネットワーク上で動作しています。
+
 ## 💡 使い方
 
 アプリケーションは `http://localhost:5000` で動作します。
