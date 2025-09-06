@@ -15,17 +15,20 @@
     </nav>
 
     <div class="container mt-5">
+        {% block content %}
         <div class="px-4 py-5 my-5 text-center">
             <h1 class="display-5 fw-bold">Security Learning Platform</h1>
             <div class="col-lg-6 mx-auto">
                 <p class="lead mb-4">This application contains known vulnerabilities for educational purposes. Please select a vulnerability to practice.</p>
-                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                    <a href="/ssrf" class="btn btn-primary btn-lg px-4 gap-3">SSRF Challenge</a>
-                    <a href="/xxe" class="btn btn-outline-secondary btn-lg px-4">XXE Challenge</a>
-                    <a href="/personalize" class="btn btn-info btn-lg px-4 gap-3">SSTI Challenge (Member Card)</a>
+                <div class="list-group">
+                    <a href="/ssrf" class="list-group-item list-group-item-action">SSRFチャレンジ</a>
+                    <a href="/xxe" class="list-group-item list-group-item-action">XXEチャレンジ</a>
+                    <a href="/personalize" class="list-group-item list-group-item-action">SSTIチャレンジ</a>
+                    <a href="/deserialize" class="list-group-item list-group-item-action">安全でないデシリアライゼーションチャレンジ</a>
                 </div>
             </div>
         </div>
+        {% endblock %}
     </div>
 
     <!-- Bootstrap JS -->

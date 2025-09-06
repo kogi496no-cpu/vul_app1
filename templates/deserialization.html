@@ -1,0 +1,42 @@
+{% extends "index.html" %}
+{% block title %}安全でないデシリアライゼーション{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>安全でないデシリアライゼーション (Insecure Deserialization) チャレンジ</h2>
+    </div>
+    <div class="card-body">
+        <p>
+            オブジェクトをシリアライズして保存や転送を行い、後でそれを復元（デシリアライズ）する機能はよくあるわよね。<br>
+            でも、もしデシリアライズするデータが攻撃者によって細工されていたらどうなる…？
+        </p>
+        <p>
+            ここでは、Pythonの<code>pickle</code>モジュールを使ってデシリアライゼーションを体験できるわ。<br>
+            下のテキストエリアに、<strong>Base64エンコードされたpickleデータ</strong>を貼り付けて送信してみて。
+            アプリはそれをデシリアライズして、中身を表示するわよ。
+        </p>
+        <hr>
+        <form method="POST" action="/deserialize">
+            <div class="mb-3">
+                <label for="data" class="form-label">Base64 Encoded Pickle Data:</label>
+                <textarea class="form-control" id="data" name="data" rows="5" placeholder="gASVBAAAAAAAAACMCGJ1aWx0aW5zlIwEZGlylJOUjAEolIwGYW5zd2VylGgCjAhlcnJvcm5llGgDjAVvdXRwdXSUSW5zZXJ0IHlvdXIgZGF0YSBoZXJlLpSULg=="></textarea>
+            </div>
+            <button type="submit" class="btn btn-danger">デシリアライズ実行</button>
+        </form>
+        
+        {% if result %}
+        <div class="mt-4">
+            <h4>デシリアライズ結果:</h4>
+            <pre class="alert alert-success"><code>{{ result }}</code></pre>
+        </div>
+        {% endif %}
+
+        {% if error %}
+        <div class="mt-4">
+            <h4>エラー:</h4>
+            <pre class="alert alert-warning"><code>{{ error }}</code></pre>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
