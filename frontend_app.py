@@ -181,22 +181,22 @@ def ssti_page():
     name = request.args.get('name', 'Guest')
     return render_template_string(template, name=name)
 
-# 安全でないデシリアライゼーション脆弱性を持つエンドポイント
+# 設定インポート機能 (安全でないデシリアライゼーション)
 @app.route('/deserialize', methods=['GET', 'POST'])
 def deserialize_page():
     if request.method == 'POST':
         b64_data = request.form.get('data')
         if not b64_data:
-            return render_template('deserialization.html', error='データが空です。')
+            return render_template('deserialization.html', error='インポートする設定データが空です。')
         
         try:
-            # Base64デコードして、pickleでデシリアライズする（脆弱な箇所）
+            # Base64デコードして、pickleでデシリアライズする（設定データを復元）
             pickle_data = base64.b64decode(b64_data)
             deserialized_object = pickle.loads(pickle_data)
             
             return render_template('deserialization.html', result=str(deserialized_object))
         except Exception as e:
-            return render_template('deserialization.html', error=f'デシリアライズ中にエラーが発生しました: {e}')
+            return render_template('deserialization.html', error=f'設定のインポート中にエラーが発生しました: {e}')
 
     return render_template('deserialization.html')
 
