@@ -1,42 +1,44 @@
-{% extends "index.html" %}
-{% block title %}安全でないデシリアライゼーション{% endblock %}
-{% block content %}
-<div class="card">
-    <div class="card-header">
-        <h2>安全でないデシリアライゼーション (Insecure Deserialization) チャレンジ</h2>
-    </div>
-    <div class="card-body">
-        <p>
-            オブジェクトをシリアライズして保存や転送を行い、後でそれを復元（デシリアライズ）する機能はよくあるわよね。<br>
-            でも、もしデシリアライズするデータが攻撃者によって細工されていたらどうなる…？
-        </p>
-        <p>
-            ここでは、Pythonの<code>pickle</code>モジュールを使ってデシリアライゼーションを体験できるわ。<br>
-            下のテキストエリアに、<strong>Base64エンコードされたpickleデータ</strong>を貼り付けて送信してみて。
-            アプリはそれをデシリアライズして、中身を表示するわよ。
-        </p>
-        <hr>
-        <form method="POST" action="/deserialize">
-            <div class="mb-3">
-                <label for="data" class="form-label">Base64 Encoded Pickle Data:</label>
-                <textarea class="form-control" id="data" name="data" rows="5" placeholder="gASVBAAAAAAAAACMCGJ1aWx0aW5zlIwEZGlylJOUjAEolIwGYW5zd2VylGgCjAhlcnJvcm5llGgDjAVvdXRwdXSUSW5zZXJ0IHlvdXIgZGF0YSBoZXJlLpSULg=="></textarea>
-            </div>
-            <button type="submit" class="btn btn-danger">デシリアライズ実行</button>
-        </form>
-        
-        {% if result %}
-        <div class="mt-4">
-            <h4>デシリアライズ結果:</h4>
-            <pre class="alert alert-success"><code>{{ result }}</code></pre>
-        </div>
-        {% endif %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>設定のインポート/エクスポート</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">設定のインポート/エクスポート</h1>
+        <p class="lead">保存した設定データをインポートして、アプリケーションに適用します。</p>
 
-        {% if error %}
-        <div class="mt-4">
-            <h4>エラー:</h4>
-            <pre class="alert alert-warning"><code>{{ error }}</code></pre>
+        <div class="card p-4 shadow-sm">
+            <form action="/deserialize" method="POST">
+                <div class="mb-3">
+                    <label for="dataInput" class="form-label">インポートする設定データ (Base64形式)</label>
+                    <textarea class="form-control" id="dataInput" name="data" rows="5" placeholder="ここにBase64エンコードされた設定データを入力してください"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">設定をインポート</button>
+            </form>
+
+            {% if result %}
+            <div class="mt-4 alert alert-success" role="alert">
+                <strong>インポート結果:</strong><br>
+                <pre>{{ result }}</pre>
+            </div>
+            {% endif %}
+
+            {% if error %}
+            <div class="mt-4 alert alert-danger" role="alert">
+                <strong>エラー:</strong><br>
+                <pre>{{ error }}</pre>
+            </div>
+            {% endif %}
         </div>
-        {% endif %}
+
+        <div class="mt-4">
+            <a href="/" class="btn btn-secondary">トップに戻る</a>
+        </div>
     </div>
-</div>
-{% endblock %}
+</body>
+</html>
