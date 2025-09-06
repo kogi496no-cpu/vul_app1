@@ -3,6 +3,9 @@ import requests
 from lxml import etree
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
+import pickle
+import base64
+import os
 
 app = Flask(__name__)
 
@@ -177,6 +180,25 @@ def ssti_page():
     template = request.args.get('template', 'Hello, {{ name }}!')
     name = request.args.get('name', 'Guest')
     return render_template_string(template, name=name)
+
+# 安全でないデシリアライゼーション脆弱性を持つエンドポイント
+@app.route('/deserialize', methods=['GET', 'POST'])
+def deserialize_page():
+    if request.method == 'POST':
+        b64_data = request.form.get('data')
+        if not b64_data:
+            return render_template('deserialization.html', error='データが空です。')
+        
+        try:
+            # Base64デコードして、pickleでデシリアライズする（脆弱な箇所）
+            pickle_data = base64.b64decode(b64_data)
+            deserialized_object = pickle.loads(pickle_data)
+            
+            return render_template('deserialization.html', result=str(deserialized_object))
+        except Exception as e:
+            return render_template('deserialization.html', error=f'デシリアライズ中にエラーが発生しました: {e}')
+
+    return render_template('deserialization.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
